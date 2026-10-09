@@ -14,6 +14,7 @@ ALLOWED_PUBLIC_FILES = frozenset({
     "PROJECT.md",
     ".github/workflows/bootstrap-integrity.yml",
     ".github/workflows/repository-safety.yml",
+    ".github/workflows/upstream-runtime-regression.yml",
     "docs/architecture/REPOSITORY_BOUNDARIES.md",
     "docs/migration/SAFE_EXTRACTION_PLAN.md",
     "docs/operations/RELEASE_GATE.md",
