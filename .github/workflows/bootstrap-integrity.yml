@@ -1,0 +1,30 @@
+name: Bootstrap Integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify repository bootstrap documents
+        run: |
+          test -s README.md
+          test -s AGENTS.md
+          test -s PROJECT.md
+          test -s docs/architecture/REPOSITORY_BOUNDARIES.md
+          test -s docs/migration/SAFE_EXTRACTION_PLAN.md
+          test -s docs/operations/RELEASE_GATE.md
+      - name: Verify repo does not accidentally track local secret files
+        run: |
+          if git ls-files | grep -E '(^|/)(\.env(\..*)?|id_rsa|id_ed25519|[^/]+\.pem|[^/]+\.p12)$'; then
+            echo "Tracked potential credentials detected"
+            exit 1
+          fi
+          echo "No obviously named secret files tracked"

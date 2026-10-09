@@ -1,0 +1,34 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.secrets/
+secrets/
+*.sqlite
+*.sqlite3
+
+# Build and temporary files
+node_modules/
+.next/
+.nuxt/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+*.log
+.DS_Store
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
+venv/
+
+# IDE/runtime state
+.vercel/
+.railway/
+.supabase/
