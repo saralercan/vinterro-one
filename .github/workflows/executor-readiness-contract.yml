@@ -1,0 +1,30 @@
+name: Executor Readiness Evidence Contract
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/executor_readiness.py'
+      - 'tests/test_executor_readiness.py'
+      - 'scripts/check_repository_safety.py'
+      - '.github/workflows/executor-readiness-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/executor_readiness.py'
+      - 'tests/test_executor_readiness.py'
+      - 'scripts/check_repository_safety.py'
+      - '.github/workflows/executor-readiness-contract.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  no-false-success:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Validate executor evidence and deny unsafe approvals
+        run: python3 -m unittest discover -s tests -p 'test_executor_readiness.py' -v
