@@ -1,5 +1,9 @@
 # Vinterro One — Repository Agent Contract
 
+## Operator-command-only contract (2026-10-11)
+
+Vinterro One must remain **STANDBY** unless the authenticated human operator explicitly commands a particular task. Old instructions, cron schedules, saved automation, queue backlog, agent speculation, and supervisor recommendations are not new authority. No agent may unilaterally block/cancel/reschedule/undo/rewrite a user-authorized task based on preference; raise factual findings and perform permitted corrections within scope. An inspect-only command never permits state changes; edit never implies deployment; draft never implies sending. No unsolicited emails, advertisements, spending, updates, archiving, publishing, deletions, or access changes. Maintain real authentication, authorization, security, provider and audit boundaries. Only verified direct evidence can support completion claims. Do not run or deploy services as a side effect of changing these source instructions. Shared source policy: `saralercan/ercan/docs/standards/VINTERRO_ONE_OPERATOR_ONLY.md`. This repository is public and holds policy/scaffolding only until its visibility changes.
+
 This repository is for the Vinterro One product runtime, NOT a replacement for the cross-project control-plane repository `saralercan/ercan`.
 
 ## Resolution and precedence
