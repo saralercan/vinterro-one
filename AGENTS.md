@@ -6,6 +6,10 @@ Vinterro One must remain **STANDBY** unless the authenticated human operator exp
 
 This repository is for the Vinterro One product runtime, NOT a replacement for the cross-project control-plane repository `saralercan/ercan`.
 
+## Drag&Drop Shopify theme operator lock (2026-10-13)
+
+For any Drag&Drop Shopify storefront theme task, Vinterro One and its agents/Codex must load the central `saralercan/ercan/docs/standards/DRAGDROP_SINGLE_DRAFT_THEME.md` policy. All ordinary changes target the **existing single UNPUBLISHED theme** `DD Kurumsal Siparisler Fotograflar 2026-10-12` (ID `198480756902`) after validating current role and identity. Never create/duplicate/copy another Shopify theme, change/publish MAIN, or target another theme without explicit separate user instruction. Preview/QA must reuse the current draft. If identity changes, block the write and report. No theme operations occur as a side effect of adding this policy.
+
 ## Resolution and precedence
 1. Verified current production registry and live application deployment for runtime truth.
 2. This project's explicit instructions and owned source for implementation details.
