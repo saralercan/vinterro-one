@@ -20,6 +20,21 @@ Only a full manual/provider audit may determine VERIFIED. Do not place project c
 ### Cutover
 Until the dedicated GitHub repository is **Private** and protected, no product source or deployment migration. CI is for static/contract regression only. Live agent execution, ads publication/budget updates, production deploys and outbound email require independent approvals and verified release gates.
 
+### Legacy queue identity check (observed 2026-10-30)
+
+Executor readiness now requires the aggregate `queued_runs_without_requester` alongside `queued_runs`. This protects against replaying historical jobs that lack an authenticated owner. A missing requester is not fixed by marking runs active, inserting fake requesters, bypassing row-level security, or switching to service-role execution. Require a freshly authenticated operator command, an explicitly scoped new run, current review and no legacy auto-replay.
+
+Read-only diagnostic SQL (return aggregate counts only; do not export user IDs, prompts or task payloads):
+
+```sql
+select
+  count(*) filter (where status = 'queued')::int as queued_runs,
+  count(*) filter (where status = 'queued' and requested_by is null)::int as queued_runs_without_requester
+from public.ercan_os_runs;
+```
+
+Production observation: 31 queued jobs have missing `requested_by`; the one blocked job has a requester. The observed 15-second sales control tick reports `tasks_routed=0`, which is not a general model executor receipt. Confirm both metrics again immediately before a newly authorized one-shot test. Existing tasks are preserved, not replayed.
+
 ### Non-local GPT and Codex Cloud activation gates (2026-10-30)
 
 **Separate three distinct capabilities.** ChatGPT is the operator command surface, not proof of a deployed dispatcher. OpenAI Responses API / Agents API is a metered model/backend runtime requiring a currently authorized, funded and budget-constrained OpenAI API project. Codex Cloud is a separate OpenAI-managed coding environment; an existing API connector does not publish or activate a Codex Cloud environment. A registry of logical agents does not mean the same number of running cloud workers.
@@ -31,4 +46,4 @@ Until the dedicated GitHub repository is **Private** and protected, no product s
 5. **Legacy tasks are quarantined:** Registration, verification, connectivity tests or deploying a worker must NOT automatically replay previously queued jobs. Require a fresh explicit operator-scoped run ID, risk classification, authorization and review. Do not send external mail, publish ads, mutate production commerce data or deploy production as part of a smoke test.
 6. **Evidence and release:** Verify provider status and reviewer independence end-to-end, confirm exact run linkage and fresh timestamps, enforce spending caps and rollback, then obtain separate approvals for production deploy and each high-risk external action. Record VERIFIED only with observed end-to-end evidence; otherwise report PARTIAL / BLOCKED / NOT_VERIFIED.
 
-Public reference documentation: [Codex Cloud environments](https://learn.chatgpt.com/docs/environments/cloud-environments), [OpenAI Agents runtime selection](https://developers.openai.com/api/docs/guides/agents).
+Public reference documentation: [Codex Cloud setup](https://help.openai.com/en/articles/20001545-using-codex-cloud), [OpenAI Agents runtime selection](https://developers.openai.com/api/docs/guides/agents).
