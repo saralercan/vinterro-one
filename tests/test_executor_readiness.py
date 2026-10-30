@@ -36,6 +36,29 @@ class ExecutorEvidenceTests(unittest.TestCase):
         self.assertEqual(result["state"], "BLOCKED")
         self.assertFalse(result["live_execution_verified"])
 
+    def test_registered_but_silent_worker_does_not_unblock_legacy_queue(self):
+        # A credential row is not a running executor. No heartbeat, no model receipts.
+        result = self.assess(
+            queued_runs=31,
+            active_registered_workers=1,
+            recent_worker_heartbeats=0,
+            tasks_routed_last_tick=0,
+        )
+        self.assertEqual(result["state"], "BLOCKED")
+        self.assertIn("no recent heartbeat from registered model executor", result["findings"])
+        self.assertIn("queued tasks are not advancing through model executor", result["findings"])
+        self.assertFalse(result["live_execution_verified"])
+
+    def test_claimed_routing_without_recent_heartbeat_is_still_blocked(self):
+        result = self.assess(
+            queued_runs=1,
+            active_registered_workers=1,
+            recent_worker_heartbeats=0,
+            tasks_routed_last_tick=1,
+        )
+        self.assertEqual(result["state"], "BLOCKED")
+        self.assertFalse(result["production_deployment_allowed"])
+
     def test_recorded_success_without_receipt_blocked(self):
         self.assertEqual(self.assess(successful_runs=1)["state"], "BLOCKED")
 
