@@ -10,6 +10,7 @@ spec.loader.exec_module(engine)
 
 BASE = dict(
     queued_runs=0,
+    queued_runs_without_requester=0,
     running_runs=0,
     successful_runs=0,
     provider_receipts=0,
@@ -58,6 +59,32 @@ class ExecutorEvidenceTests(unittest.TestCase):
         )
         self.assertEqual(result["state"], "BLOCKED")
         self.assertFalse(result["production_deployment_allowed"])
+
+    def test_legacy_queue_without_authenticated_requester_is_blocked(self):
+        result = self.assess(
+            queued_runs=31,
+            queued_runs_without_requester=31,
+            recent_worker_heartbeats=1,
+            tasks_routed_last_tick=1,
+        )
+        self.assertEqual(result["state"], "BLOCKED")
+        self.assertIn(
+            "queued runs lack an authenticated requester; legacy backlog must not replay automatically",
+            result["findings"],
+        )
+        self.assertFalse(result["live_execution_verified"])
+
+    def test_requester_missing_count_cannot_exceed_queued_count(self):
+        with self.assertRaises(ValueError):
+            self.assess(queued_runs=3, queued_runs_without_requester=4)
+
+    def test_requester_missing_metric_is_required_and_nonnegative(self):
+        missing = {k: v for k, v in BASE.items() if k != "queued_runs_without_requester"}
+        for bad in (missing, {**BASE, "queued_runs_without_requester": True},
+                    {**BASE, "queued_runs_without_requester": -1}):
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError):
+                    engine.assess(bad)
 
     def test_recorded_success_without_receipt_blocked(self):
         self.assertEqual(self.assess(successful_runs=1)["state"], "BLOCKED")
