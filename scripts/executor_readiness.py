@@ -12,6 +12,7 @@ from pathlib import Path
 
 REQUIRED = (
     "queued_runs",
+    "queued_runs_without_requester",
     "running_runs",
     "successful_runs",
     "provider_receipts",
@@ -34,11 +35,15 @@ def assess(metrics: dict) -> dict:
         normalized[name] = value
 
     m = normalized
+    if m["queued_runs_without_requester"] > m["queued_runs"]:
+        raise ValueError("missing-requester count cannot exceed queued runs")
     findings: list[str] = []
     if m["active_registered_workers"] == 0:
         findings.append("no active registered model executor")
     if m["recent_worker_heartbeats"] == 0:
         findings.append("no recent heartbeat from registered model executor")
+    if m["queued_runs_without_requester"] > 0:
+        findings.append("queued runs lack an authenticated requester; legacy backlog must not replay automatically")
     if m["queued_runs"] > 0 and m["tasks_routed_last_tick"] == 0:
         findings.append("queued tasks are not advancing through model executor")
     if m["successful_runs"] > m["provider_receipts"]:
